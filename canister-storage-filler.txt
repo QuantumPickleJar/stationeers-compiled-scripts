@@ -1,0 +1,44 @@
+# Switch on-off and see the pin's names
+alias canisterstorage d0 #l.1
+alias fillpump d1 #l.1
+alias evacpump d2 #l.1
+alias analyzer d4 #l.1
+yield #l.1
+# Automatic gas-canister filler.
+# !!! Remember to set volume pump to no more !!!
+# !!! than 10 L; I run 2 L for safety !!!
+# Hashes for canister types (keep as integers you used)
+Start:
+yield #l.15
+# pause one tick
+# --- Check slot 0 for a canister and identify it
+ls r4 d0 0 Occupied #l.18
+ls r3 d0 0 OccupantHash #l.19
+# --- Decide safe fill pressure by canister type
+move r2 8000 #l.22
+# default for regular cans
+bne r3 -668314371 22 #l.23
+move r2 18000 #l.24
+j 24 #l.23
+bne r3 42280099 24 #l.25
+move r2 8000 #l.26
+# --- Fill: only if a can is present and pressure is below target
+ls r0 d0 0 Pressure #l.30
+slt r1 r0 r2 #l.31
+and r0 r1 r4 #l.32
+s d1 On r0 #l.34
+# If no can is present, evacuate the pipe
+bne r4 0 32 #l.37
+j Evac #l.37
+j Start #l.40
+Evac:
+# Evacuate analyzer line until it reads 0 kPa
+l r0 d4 Pressure #l.44
+sgt r1 r0 0 #l.45
+s d2 On r1 #l.46
+beqz r1 40 #l.48
+j Evac #l.48
+j Start #l.50
+# Compiled at 2025-10-24 11:47 by Exca's Basic10.
+##! Changes in code does not reflect in link below !!
+##!https://ic10.dev/#eNqNVE1z4zYM/SsIc2g7I2dIifqwekrTdDYzmd10c/WFliiHjUy5IpVd707++wKU5Q9tD73YIgA+PDwA/M6eq97s/Ee11axkLGJVV9PXNTx/Mb56gc4uuqYBZWtwWoN/0bAz9hcHFq+4lVWtUQ4qZY3zune+69VGQ83hur0Rk7sxbbsbtjuoxYVdv6lqtMcXdoX/+2+6h1oe7Huj2/rwfQ23g++2ypsKNsotpuQhje5vKOLq6go+663ertHuO+Tu4a1rhy3Sp4Rosh1su15T6HTDvygLgsPj7/AA/WAhhkdouh6carTfT6EflHvRLjiOuf1+h6ZfX7XeAVZgrNcb1AP23QCD0/VvK/vsVe/L81pSQtsp9KPOKK6pXsmyWCzg7kVXr+DazgMPmdQpFzXD1Np60+zB+JVtHfSSROfwqaqGndEjfjG6kjOXsp7oB/dySvanrhAvVBlEhF2vnRtQnPX+ssSV3XZvGvoYCs5Dk+OYUGrdqKH1gWmvN0OrgjY4IGssDBkssqxIhExyAXFodpycsMQRTK7sPxDLKeBwWcYxRiyXkyf9DxrZVMxfWECJeraoTTPKBsaFklCyIN6xPLSvddt9AWzNRh+U5KNcT1MQoid8ZR2W1wty96GAhMYVwcggSH+yoRiOpvyTJTtZJPF6aGjcLplEYfwH5aetInVDwRKzJ2OOnPS4x7jTKYwRHSWSIldJGe4nrOPutAaxBhySFmcEm6Jqh7ivTwqrDEXKixIlEnWbqcTAXaahmjhUEzZXospr/e83OsoxpjhnOJ6ODFNO1O667c60OJLKQ8zjdCH4AhspRClzGrD7r5XCB+UP5Uwl+A0+Qqb6Or5GtX4zlXas/M4E/SDhRq1pgFm5EHEh8yTP84iN79dCLNO8kFnBI/ZZN7rXttIPNStFxJ5xkwIOp5/zVcB7uZR8WcgC46b9CZf+HjDG+D0e3t8j9oiKfhzoSWFlkkXsvu+7nnwRkzjcPEvlTySTWEieZHx5IplkRVZIkeQzlhMGkrCs5ISaF8mS52nyf2CLIpEyxTWbw04gIy6xRaGwD1me83yOLJM0K1Keigk4T/OU1i+ZwZ5hRGwaJNSF85AAiUjO84LPE4gMuWdpIrOfAI93zgEzXHASfxwF4jSNA7szfTXgbH/oBmfshp23gdEz8IRPPbuQkdGkHszz6yWCRqeA8uxedIIrT0lmQrLbw+qh4/hZXsQc63C33qvqheZsrKVeX9KvxYx4HdM+rA8s8XTJrxaXzGo5Sz0nW4coHqJOzZq1jgLe338AzTZiQQ==
