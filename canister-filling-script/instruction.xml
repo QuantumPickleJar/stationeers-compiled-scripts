@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<InstructionData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <DateTime>134056925354966516</DateTime>
+  <GameVersion>0.2.4297.19997</GameVersion>
+  <Title>canister-filling-script</Title>
+  <Description />
+  <Author>Basic IC10 Compiler</Author>
+  <WorkshopFileHandle>0</WorkshopFileHandle>
+  <Instructions># Switch on-off and see the pin's names
+alias canisterstorage d0 #l.1
+alias fillpump d1 #l.1
+alias evacpump d2 #l.1
+alias analyzer d4 #l.1
+yield #l.1
+# Automatic gas-canister filler.
+# !!! Remember to set volume pump to no more !!!
+# !!! than 10 L; I run 2 L for safety !!!
+# Hashes for canister types (keep as integers you used)
+Start:
+yield #l.15
+# pause one tick
+# --- Check slot 0 for a canister and identify it
+ls r4 d0 0 Occupied #l.18
+ls r3 d0 0 OccupantHash #l.19
+# --- Decide safe fill pressure by canister type
+move r2 8000 #l.22
+# default for regular cans
+bne r3 -668314371 22 #l.23
+move r2 18000 #l.24
+j 24 #l.23
+bne r3 42280099 24 #l.25
+move r2 8000 #l.26
+# --- Fill: only if a can is present and pressure is below target
+ls r0 d0 0 Pressure #l.30
+slt r1 r0 r2 #l.31
+and r0 r1 r4 #l.32
+s d1 On r0 #l.34
+# If no can is present, evacuate the pipe
+bne r4 0 32 #l.37
+j Evac #l.37
+j Start #l.40
+Evac:
+# Evacuate analyzer line until it reads 0 kPa
+l r0 d4 Pressure #l.44
+sgt r1 r0 0 #l.45
+s d2 On r1 #l.46
+beqz r1 40 #l.48
+j Evac #l.48
+j Start #l.50
+# Compiled at 2025-10-24 11:47 by Exca's Basic10.</Instructions>
+</InstructionData>

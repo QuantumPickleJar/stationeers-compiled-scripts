@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<InstructionData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <DateTime>134059368698127737</DateTime>
+  <GameVersion>0.2.4297.19997</GameVersion>
+  <Title>simple-cooling-tower-script</Title>
+  <Description />
+  <Author>Basic IC10 Compiler</Author>
+  <WorkshopFileHandle>0</WorkshopFileHandle>
+  <Instructions># Switch on-off and see the pin's names
+alias sensor d0 #l.1
+alias pump d1 #l.1
+yield #l.1
+# Automatically evacuates cooling-tower when temp
+# is below 40C
+# needs a volume pump and a gas analyzer
+# Set the volume pump to its max capacity
+l r0 d1 Maximum #l.13
+s d1 Setting r0 #l.13
+Start:
+yield #l.16
+# one tick
+l r1 d0 Temperature #l.17
+l r0 d0 Pressure #l.18
+slt r2 r1 313.15 #l.20
+sgt r1 r0 0 #l.21
+and r0 r2 r1 #l.23
+s d1 On r0 #l.23
+j Start #l.24
+# Compiled at 2025-10-27 12:21 by Exca's Basic10.</Instructions>
+</InstructionData>

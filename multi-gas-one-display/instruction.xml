@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<InstructionData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <DateTime>134054395698858094</DateTime>
+  <GameVersion>0.2.4297.19997</GameVersion>
+  <Title>multi-gas-one-display</Title>
+  <Description>dial + console to allow selecting which tank is being viewed</Description>
+  <Author>Basic IC10 Compiler</Author>
+  <WorkshopFileHandle>0</WorkshopFileHandle>
+  <Instructions># Switch on-off and see the pin's names
+alias display d0 #l.1
+yield #l.1
+# Single-dial gas tank viewer
+# hint: use an array of gas tanks
+printDisplay:
+# Compiled at 2025-10-21 18:10 by Exca's Basic10.</Instructions>
+</InstructionData>

@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<InstructionData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <DateTime>134056158109921815</DateTime>
+  <GameVersion>0.2.4297.19997</GameVersion>
+  <Title>rad-loop-simple-control</Title>
+  <Description>simple script for controlling a gas loop of some typer</Description>
+  <Author>Basic IC10 Compiler</Author>
+  <WorkshopFileHandle>0</WorkshopFileHandle>
+  <Instructions># Switch on-off and see the pin's names
+alias tempcheck d0 #l.1
+alias evacpump d1 #l.1
+alias radscheck d2 #l.1
+alias coolantvalve d3 #l.1
+yield #l.1
+# check cooled side to avoid bursting
+# condensation prevention
+# CONST DANGER_TEMP
+# CONST DANGER_PRESSURE
+# if tempCheck.Temperature
+Start:
+yield #l.21
+l r0 d0 Pressure #l.23
+l r3 d0 Temperature #l.24
+# content-based temperature safety
+# if there is gas in the radiator pipe, evacPump should come on
+sgt r2 r0 40000 #l.30
+slt r1 r3 293.15 #l.30
+or r0 r2 r1 #l.30
+beqz r0 24 #l.30
+s d3 Setting 0 #l.31
+# evacPump.Setting = 1
+j 27 #l.30
+blt r3 293.15 27 #l.33
+s d3 Setting 1 #l.34
+# evacPump.Setting =
+j Start #l.38
+# Compiled at 2025-10-23 19:10 by Exca's Basic10.</Instructions>
+</InstructionData>
