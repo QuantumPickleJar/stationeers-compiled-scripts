@@ -1,128 +1,83 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <InstructionData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <DateTime>134060206526393272</DateTime>
+  <DateTime>134067378007737984</DateTime>
   <GameVersion>0.2.4297.19997</GameVersion>
   <Title>onboard-ic-combustion-centrifuge</Title>
   <Description />
   <Author>Basic IC10 Compiler</Author>
   <WorkshopFileHandle>0</WorkshopFileHandle>
-  <Instructions>move r2 0 #l.76
-# tuneables
-move r8 45 #l.2
+  <Instructions># tuneables
 # hysteresis band
-move r5 10 #l.4
 # throttle step increment
-move r11 10 #l.5
-move sp 57 #l.5
-# push band into stack
-push r11 #l.5
 # fudge factor for stress
-move r7 20 #l.6
 # throttle limiter while accelerating
-move r11 50 #l.7
-# push lim_high into stack
-push r11 #l.7
 # limiter once stable
-move r11 100 #l.8
-# push launch_rpm into stack
-push r11 #l.8
 # switch from pulsing to closed loop here
-move r10 450 #l.9
 # considered at-speed
-# clamp to 0..100 and snap to nearest 10
-# expects rTmp input, returns in rTmp
-snap10:
-# nearest multiple of 10 =&gt; round(x/10) * 10
-div r0 r1 10 #l.24
-add r1 r0 0.5 #l.24
-floor r0 r1 #l.25
-mul r1 r0 10 #l.25
-max r1 r1 0 #l.26
-# check this line
-min r1 r1 100 #l.27
 init:
 # safe defaults
-s db On 1 #l.33
-move r3 0 #l.34
-move r0 r7 #l.35
-j setKnobs #l.36
+s db On 1 #l.22
+move r3 0 #l.23
+move r2 20 #l.24
+j setKnobs #l.25
 startup:
 # pulse 10% throttle
-l r9 db Rpm #l.40
-move sp 60 #l.41
-# pop launch_rpm from stack
-pop r11 #l.41
-bge r9 r11 48 #l.41
-j pulse #l.41
-j control #l.42
-pulse:
-move r3 r5 #l.45
-j setKnobs #l.46
+l r6 db Rpm #l.29
+bge r6 100 20 #l.30
+move r3 10 #l.31
+j setKnobs #l.32
 control:
 # read current telemetry
-l r4 db Stress #l.50
-l r9 db Rpm #l.51
+l r4 db Stress #l.39
+l r6 db Rpm #l.40
 # choose limiter
-move sp 59 #l.54
-# pop lim_high from stack
-pop r11 #l.54
-move r0 r11 #l.54
-bge r9 r10 64 #l.55
-move r0 r7 #l.56
+move r2 50 #l.43
+bge r6 450 29 #l.44
+move r2 20 #l.45
 # todo: verify if this belongs outside IF
-# throttle up/down with hysteresis around target
-l r3 db Throttle #l.61
-move sp 58 #l.62
-# pop band from stack
-pop r11 #l.62
-div r6 r11 2 #l.62
-sub r1 r8 r6 #l.64
-bge r4 r1 73 #l.65
-j th_up #l.65
-add r1 r8 r6 #l.68
-ble r4 r1 76 #l.69
-j th_down #l.69
+move r5 5 #l.50
+# rTmp = target - halfBand
+# IF rStress &lt; rTmp THEN GOTO thUp
+sub r0 45 r5 #l.54
+bge r4 r0 35 #l.54
+j thUp #l.54
+add r1 45 r5 #l.57
+add r0 45 r5 #l.58
+ble r4 r0 39 #l.58
+j thDown #l.58
 setKnobs:
-move r1 r3 #l.75
-add sp 6 r2 #l.76
-push ra #l.76
-add r2 r2 1 #l.76
-jal snap10 #l.76
-sub r2 r2 1 #l.76
-add sp 7 r2 #l.76
-pop ra #l.76
-s db Throttle r1 #l.77
-move r1 r0 #l.79
-push ra #l.80
-add r2 r2 1 #l.80
-jal snap10 #l.80
-sub r2 r2 1 #l.80
-add sp 7 r2 #l.80
-pop ra #l.80
+# round rTh to nearest 10, clamp 0..100, cap by limiter
+move r1 r3 #l.65
+div r0 r1 10 #l.66
+add r1 r0 0.5 #l.66
+floor r0 r1 #l.67
+mul r1 r0 10 #l.67
+bge r1 0 48 #l.69
+move r1 0 #l.69
+ble r1 100 50 #l.70
+move r1 100 #l.70
+ble r1 r2 52 #l.71
+move r1 r2 #l.71
+s db Throttle r1 #l.72
+move r1 r2 #l.74
+div r0 r1 10 #l.75
+add r1 r0 0.5 #l.75
+floor r0 r1 #l.76
+mul r1 r0 10 #l.76
+bge r1 0 60 #l.78
+move r1 0 #l.78
+ble r1 100 62 #l.79
+move r1 100 #l.79
 s db Limiter r1 #l.81
 yield #l.83
 j startup #l.84
-th_up:
-l r1 db Throttle #l.87
-add r1 r1 r5 #l.88
-add sp 6 r2 #l.89
-push ra #l.89
-add r2 r2 1 #l.89
-jal snap10 #l.89
-sub r2 r2 1 #l.89
-add sp 7 r2 #l.89
-pop ra #l.89
-j setKnobs #l.90
-th_down:
-l r1 db Throttle #l.93
-sub r1 r1 r5 #l.94
-add sp 6 r2 #l.95
-push ra #l.95
-add r2 r2 1 #l.95
-jal snap10 #l.95
-sub r2 r2 1 #l.95
-add sp 7 r2 #l.95
-pop ra #l.95
-j setKnobs #l.96
-# Compiled at 2025-10-27 19:42 by Exca's Basic10.</Instructions>
+thUp:
+l r0 db Throttle #l.87
+add r3 r0 10 #l.87
+j setKnobs #l.88
+thDown:
+l r0 db Throttle #l.91
+sub r3 r0 10 #l.91
+j setKnobs #l.92
+# Compiled at 2025-11-05 19:49 by Exca's Basic10.</Instructions>
 </InstructionData>
